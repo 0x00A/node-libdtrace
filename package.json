@@ -7,8 +7,21 @@
   "engines": { 
     "node": ">=0.9.x" 
   },
-  "main": "./build/Release/libdtrace",
+  "devDependencies": {
+    "tap": "0.3.3"
+  },
   "scripts": {
-    "install": "node-waf configure build"
-  }
+    "test": "sudo ./test/test"
+  },
+  "main": "./build/Release/dtrace",
+  "maintainers": [
+    {
+      "name": "Paolo Fragomeni",
+      "email": "paolo@async.ly"
+    },
+    {
+      "name": "Bryan Cantrill",
+      "email": "bryan@joyent.com"
+    }
+  ]
 }

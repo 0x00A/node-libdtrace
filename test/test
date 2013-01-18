@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var path = require('path');
+var tap = require('tap').test;
+
+var pathname = path.join(__dirname, 'tests');
+
+var filter = process.argv[2] || null
+var caseFilter = process.argv[3] || null
+
+fs.readdirSync(pathname).forEach(function (name) {
+
+  if (filter && name.indexOf(filter) < 0) { return; }
+
+  if (path.extname(name) === '.js') {
+
+    var basename = path.basename(name, '.js');
+    var rawfile = path.join(pathname, basename);
+
+    var tests = require(rawfile);
+
+    for (var test in tests) {
+      if (!caseFilter || test.indexOf(caseFilter) > -1) {
+        tap(test, tests[test]);
+      }
+    }
+  }
+});

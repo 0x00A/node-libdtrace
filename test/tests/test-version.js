@@ -1,5 +1,5 @@
 var sys = require('sys');
-var libdtrace = require('libdtrace');
+var libdtrace = require('../../build/Release/dtrace');
 var assert = require('assert');
 var fs = require('fs');
 

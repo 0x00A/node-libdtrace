@@ -9,9 +9,10 @@
 
 #include <v8.h>
 #include <node.h>
+#include <uv.h>
+
 #include <string.h>
 #include <unistd.h>
-#include <node_object_wrap.h>
 #include <errno.h>
 #include <string>
 #include <vector>
@@ -115,8 +116,6 @@ private:
 	Local<Array> *dtc_ranges;
 	dtrace_aggvarid_t dtc_ranges_varid;
 };
-
-Persistent<FunctionTemplate> DTraceConsumer::dtc_templ;
 
 DTraceConsumer::DTraceConsumer() : node::ObjectWrap()
 {
@@ -393,8 +392,6 @@ DTraceConsumer::Setopt(const Arguments& args)
 {
 	DTraceConsumer *dtc = ObjectWrap::Unwrap<DTraceConsumer>(args.Holder());
 	dtrace_hdl_t *dtp = dtc->dtc_handle;
-	dtrace_prog_t *dp;
-	dtrace_proginfo_t info;
 	int rval;
 
 	if (args.Length() < 1 || !args[0]->IsString())
@@ -887,8 +884,11 @@ DTraceConsumer::Version(const Arguments& args)
 	return (String::New(_dtrace_version));
 }
 
-extern "C" void
-init (Handle<Object> target) 
-{
+Persistent<FunctionTemplate> DTraceConsumer::dtc_templ;
+
+extern "C" void 
+init (Handle<Object> target) {
 	DTraceConsumer::Initialize(target);
 }
+
+NODE_MODULE(dtrace, init)

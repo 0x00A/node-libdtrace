@@ -1,5 +1,5 @@
 var util = require('util');
-var libdtrace = require('libdtrace');
+var libdtrace = require('../../build/Release/dtrace');
 var i;
 
 dtp = new libdtrace.Consumer();
