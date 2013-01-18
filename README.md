@@ -1,40 +1,32 @@
 
-node-libdtrace
-==============
+# node-libdtrace(3)
 
-Overview
---------
-
+## Overview
 node-libdtrace is a Node.js addon that interfaces to libdtrace, allowing
 node programs to control DTrace enablings.
 
-Status
-------
-
+## Status
 The primary objective is not to create a `dtrace(1M)` alternative in node, but
 rather to allow node programs to create and control programmatically useful
 DTrace enablings.  That is, the goal is software-software interaction, and as
 such, DTrace actions related to controlling output (e.g., `printf()`,
 `printa()`) are not supported.  Error handling is, for the moment, weak.
 
-Platforms
----------
-
+## Platforms
 This should work on any platform that supports DTrace, and is known to work on
 Mac OS X (tested on 10.6.4) and Solaris, OpenSolaris and derivatives (tested on
 Nevada 121 and later).
 
-Installation
-------------
-
+## Installation
 As an addon, nod-libdtrace is installed in the usual way:
 
-      % node-waf configure
-      % node-waf build
-      % node-waf
+```bash
+% node-waf configure
+% node-waf build
+% node-waf
+```
 
-API
----
+## API
 
 ### `new libdtrace.Consumer()`
 
@@ -130,76 +122,76 @@ order, and may interleave aggregation variables and/or keys.
 
 Returns the version string, as returned from `dtrace -V`.
 
-Examples
---------
+## Examples
 
 ### Hello world
-
 The obligatory "hello world":
 
-      var sys = require('sys');
-      var libdtrace = require('libdtrace');
-      var dtp = new libdtrace.Consumer();
-        
-      var prog = 'BEGIN { trace("hello world"); }';
-        
-      dtp.strcompile(prog);
-      dtp.go();
-        
-      dtp.consume(function (probe, rec) {
-              if (rec)
-                      sys.puts(rec.data);
-      });
+```js
+  var sys = require('sys');
+  var libdtrace = require('libdtrace');
+  var dtp = new libdtrace.Consumer();
+    
+  var prog = 'BEGIN { trace("hello world"); }';
+    
+  dtp.strcompile(prog);
+  dtp.go();
+    
+  dtp.consume(function (probe, rec) {
+          if (rec)
+                  sys.puts(rec.data);
+  });
+```
 
 ### Using aggregations
-
 A slightly more sophisticated example showing system calls aggregated and
 sorted by executable name:
 
-      var sys = require('sys');
-      var libdtrace = require('libdtrace');
-      var dtp = new libdtrace.Consumer();
-      
-      var prog = 'syscall:::entry { @[execname] = count(); }'
-      
-      dtp.strcompile(prog);
-      dtp.go();
-      
-      var syscalls = {};
-      var keys = [];
-      
-      var pad = function (val, len)
-      {
-              var rval = '', i, str = val + '';
-      
-              for (i = 0; i < Math.abs(len) - str.length; i++)
-                      rval += ' ';
-      
-              rval = len < 0 ? str + rval : rval + str;
-      
-              return (rval);
-      };
-      
-      setInterval(function () {
-              var i;
-      
-              sys.puts(pad('EXECNAME', -40) + pad('COUNT', -10));
-      
-              dtp.aggwalk(function (id, key, val) {
-                      if (!syscalls.hasOwnProperty(key[0]))
-                      	keys.push(key[0]);
-      
-                      syscalls[key[0]] = val;
-              });
-      
-              keys.sort();
-      
-              for (i = 0; i < keys.length; i++) {
-                      sys.puts(pad(keys[i], -40) + pad(syscalls[keys[i]], -10));
-                      syscalls[keys[i]] = 0;
-              }
-      
-              sys.puts('');
-      }, 1000);
-
+```js
+  var sys = require('sys');
+  var libdtrace = require('libdtrace');
+  var dtp = new libdtrace.Consumer();
+  
+  var prog = 'syscall:::entry { @[execname] = count(); }'
+  
+  dtp.strcompile(prog);
+  dtp.go();
+  
+  var syscalls = {};
+  var keys = [];
+  
+  var pad = function (val, len)
+  {
+          var rval = '', i, str = val + '';
+  
+          for (i = 0; i < Math.abs(len) - str.length; i++)
+                  rval += ' ';
+  
+          rval = len < 0 ? str + rval : rval + str;
+  
+          return (rval);
+  };
+  
+  setInterval(function () {
+          var i;
+  
+          sys.puts(pad('EXECNAME', -40) + pad('COUNT', -10));
+  
+          dtp.aggwalk(function (id, key, val) {
+                  if (!syscalls.hasOwnProperty(key[0]))
+                  	keys.push(key[0]);
+  
+                  syscalls[key[0]] = val;
+          });
+  
+          keys.sort();
+  
+          for (i = 0; i < keys.length; i++) {
+                  sys.puts(pad(keys[i], -40) + pad(syscalls[keys[i]], -10));
+                  syscalls[keys[i]] = 0;
+          }
+  
+          sys.puts('');
+  }, 1000);
+```
 
