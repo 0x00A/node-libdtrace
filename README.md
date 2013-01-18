@@ -21,9 +21,8 @@ Nevada 121 and later).
 As an addon, nod-libdtrace is installed in the usual way:
 
 ```bash
-% node-waf configure
-% node-waf build
-% node-waf
+% node-gyp configure
+% node-gyp build
 ```
 
 ## API
